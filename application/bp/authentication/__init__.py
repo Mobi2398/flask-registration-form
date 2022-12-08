@@ -24,4 +24,16 @@ def user_by_id(user_id):
     return render_template('user.html', user=user)
 
 
-
+@authentication.route('/registration', methods=['GET', 'POST'])
+def registration():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User.find_user_by_email(form.email.data)
+        if user is None:
+            user = User.create(form.email.data, form.password.data)
+            user.save()
+            print(user.id)
+            return redirect(url_for('authentication.dashboard', name='John'))
+        else:
+            flash('Already Registered')
+    return render_template('registration.html', form=form)
